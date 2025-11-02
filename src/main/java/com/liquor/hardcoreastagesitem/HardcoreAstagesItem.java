@@ -1,9 +1,13 @@
 package com.liquor.hardcoreastagesitem;
 
 import com.liquor.hardcoreastagesitem.Items.UnknownItem;
+import com.liquor.hardcoreastagesitem.commands.RebakeCommand;
+import com.mojang.authlib.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import net.neoforged.bus.api.IEventBus;
@@ -21,6 +25,8 @@ public class HardcoreAstagesItem {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
 
+    public static BakedModel Ironraw = null;
+
     public HardcoreAstagesItem(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
 
@@ -33,8 +39,9 @@ public class HardcoreAstagesItem {
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
-    }
 
+        NeoForge.EVENT_BUS.register(RebakeCommand.class);
+    }
 
     private void onModelBaking(ModelEvent.BakingCompleted event) {
         LOGGER.debug("Baking...");
@@ -48,7 +55,16 @@ public class HardcoreAstagesItem {
         ModelManager modelManager = event.getModelManager();
 
         BakedModel replaceModel = modelManager.getModel(UnknownModel);
+        BakedModel rawModel = modelManager.getModel(OriginModel);
+        Ironraw = rawModel;
+        LOGGER.debug(Ironraw.toString());
 
+        replaceModel(OriginModel, replaceModel, modelManager);
+
+    }
+
+    public static void replaceModel (ModelResourceLocation OriginModel, BakedModel replaceModel, ModelManager modelManager) {
+        Minecraft minecraft = Minecraft.getInstance();
         try {
             Field modelsField = ModelManager.class.getDeclaredField("bakedRegistry");
             modelsField.setAccessible(true); // 允许访问私有字段
@@ -59,10 +75,12 @@ public class HardcoreAstagesItem {
 
             bakedRegistry.put(OriginModel, replaceModel);
             System.out.println("Replaced Success");
+            LOGGER.debug(bakedRegistry.get(OriginModel).toString());
 
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
             System.err.println("Replaced Failed");
         }
+        minecraft.getItemRenderer().onResourceManagerReload(minecraft.getResourceManager());
     }
 }

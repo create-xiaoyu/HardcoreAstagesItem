@@ -28,4 +28,5 @@ public class HardcoreAstagesItemClient {
         HardcoreAstagesItem.LOGGER.info("HELLO FROM CLIENT SETUP");
         HardcoreAstagesItem.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
     }
+
 }
