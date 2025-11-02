@@ -1,5 +1,6 @@
 package com.liquor.hardcoreastagesitem.commands;
 
+import com.liquor.hardcoreastagesitem.GetUnknownItemList;
 import com.liquor.hardcoreastagesitem.HardcoreAstagesItem;
 import com.liquor.hardcoreastagesitem.HardcoreAstagesItemClient;
 import com.mojang.brigadier.CommandDispatcher;
@@ -26,6 +27,8 @@ import org.slf4j.Logger;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -54,15 +57,26 @@ public class RebakeCommand {
         Minecraft minecraft = Minecraft.getInstance();
         ModelManager modelManager = minecraft.getModelManager();
 
-        ResourceLocation UnknownItemResource = ResourceLocation.parse("hardcoreastagesitem:unknown_item");
-        ResourceLocation OriginResource = ResourceLocation.parse( "minecraft:iron_ingot");
+        final List<String> preUnknownItemList = HardcoreAstagesItem.getpreUnknownItemList();
+        final List<String> UnknownItemList = HardcoreAstagesItem.getUnknownItemList();
 
-        ModelResourceLocation UnknownModel =  new ModelResourceLocation(UnknownItemResource, "inventory");
-        ModelResourceLocation OriginModel =  new ModelResourceLocation(OriginResource, "inventory");
+        // ResourceLocation UnknownItemResource = ResourceLocation.parse("hardcoreastagesitem:unknown_item");
+        // ModelResourceLocation UnknownModel =  new ModelResourceLocation(UnknownItemResource, "inventory");
+        for (String ItemName : preUnknownItemList) {
+            if (UnknownItemList.contains(ItemName)) {
+                continue;
+            }else{
+                ResourceLocation OriginResource = ResourceLocation.parse(ItemName);
+                ModelResourceLocation OriginModel =  new ModelResourceLocation(OriginResource, "inventory");
+                BakedModel replaceModel = HardcoreAstagesItem.replacedmap.get(ItemName);
+                // BakedModel replaceModel = modelManager.getModel(OriginModel);
+                // replaceModel = HardcoreAstagesItem.Ironraw;
+                HardcoreAstagesItem.replaceModel(OriginModel, replaceModel, modelManager);
+            }
 
-        BakedModel replaceModel = modelManager.getModel(OriginModel);
-        replaceModel = HardcoreAstagesItem.Ironraw;
+        }
+        GetUnknownItemList.getItemsForStage("Iron");
 
-        HardcoreAstagesItem.replaceModel(OriginModel, replaceModel, modelManager);
     }
+
 }
