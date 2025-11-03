@@ -25,8 +25,6 @@ public class HardcoreAstagesItemClient {
     @SubscribeEvent
     static void onClientSetup(FMLClientSetupEvent event) {
         // Some client setup code
-        HardcoreAstagesItem.LOGGER.info("HELLO FROM CLIENT SETUP");
-        HardcoreAstagesItem.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
     }
 
 }

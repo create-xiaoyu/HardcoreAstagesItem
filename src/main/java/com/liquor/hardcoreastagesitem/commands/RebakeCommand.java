@@ -3,7 +3,6 @@ package com.liquor.hardcoreastagesitem.commands;
 import com.liquor.hardcoreastagesitem.GetUnknownItemList;
 import com.liquor.hardcoreastagesitem.HardcoreAstagesItem;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.commands.CommandSourceStack;
@@ -14,12 +13,11 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
-import org.slf4j.Logger;
+
 import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
 public class RebakeCommand {
-    public static final Logger LOGGER = LogUtils.getLogger();
     @SubscribeEvent
     public static void registerCommands(RegisterClientCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
@@ -27,38 +25,35 @@ public class RebakeCommand {
         dispatcher.register(Commands.literal("reloadmodel")
                 .requires(cs -> cs.hasPermission(0))
                 .executes(context -> {
-                    reloadmodel();
-                    context.getSource().sendSuccess(
+                    reloadModel();
+                    /* context.getSource().sendSuccess(
                             () -> Component.literal("Reload Model Successfully!"),
                             true
-                    );
+                    ); */
                     return 1;
                 })
         );
     }
 
-    public static void reloadmodel() {
+    public static void reloadModel() {
         Minecraft minecraft = Minecraft.getInstance();
         ModelManager modelManager = minecraft.getModelManager();
 
         final List<String> preUnknownItemList = HardcoreAstagesItem.getpreUnknownItemList();
-        final List<String> UnknownItemList = GetUnknownItemList.getUnknownItemList();
+        final List<String> unknownItemList = GetUnknownItemList.getUnknownItemList();
 
-        for (String ItemName : preUnknownItemList) {
-            if (UnknownItemList.contains(ItemName)) {
+        for (String itemName : preUnknownItemList) {
+            if (unknownItemList.contains(itemName)) {
                 continue;
             }else{
-                ResourceLocation OriginResource = ResourceLocation.parse(ItemName);
+                ResourceLocation originResource = ResourceLocation.parse(itemName);
 
-                ModelResourceLocation OriginModel =  new ModelResourceLocation(OriginResource, "inventory");
+                ModelResourceLocation originModel =  new ModelResourceLocation(originResource, "inventory");
 
-                BakedModel replaceModel = HardcoreAstagesItem.replacedmap.get(ItemName);
+                BakedModel replaceModel = HardcoreAstagesItem.replacedMap.get(itemName);
 
-                HardcoreAstagesItem.replaceModel(OriginModel, replaceModel, modelManager);
+                HardcoreAstagesItem.replaceModel(originModel, replaceModel, modelManager);
             }
-
         }
-
     }
-
 }

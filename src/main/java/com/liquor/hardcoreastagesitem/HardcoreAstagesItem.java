@@ -22,12 +22,10 @@ import java.util.*;
 public class HardcoreAstagesItem {
     // Define mod id in a common place for everything to reference
     public static final String MODID = "hardcoreastagesitem";
-    // Directly reference a slf4j logger
-    public static final Logger LOGGER = LogUtils.getLogger();
 
     private static boolean isExecuted = false;
 
-    public static Map<String, BakedModel> replacedmap = new HashMap<>();
+    public static Map<String, BakedModel> replacedMap = new HashMap<>();
 
     private static List<String> preUnknownItemList = new ArrayList<>();
 
@@ -56,33 +54,33 @@ public class HardcoreAstagesItem {
     @SubscribeEvent
     private void onPlayerEnterWorld(RenderGuiEvent.Post event) {
         if (!isExecuted) {
-            preUnknownItemList = GetUnknownItemList.getpreUnknownItemList();
+            preUnknownItemList = GetUnknownItemList.getPreUnknownItemList();
             isExecuted = true;
 
             Minecraft minecraft = Minecraft.getInstance();
             ModelManager modelManager = minecraft.getModelManager();
 
-            ResourceLocation UnknownItemResource = ResourceLocation.parse("hardcoreastagesitem:unknown_item");
-            ModelResourceLocation UnknownModel =  new ModelResourceLocation(UnknownItemResource, "inventory");
-            BakedModel replaceModel = modelManager.getModel(UnknownModel);
+            ResourceLocation unknownItemResource = ResourceLocation.parse("hardcoreastagesitem:unknown_item");
+            ModelResourceLocation unknownModel =  new ModelResourceLocation(unknownItemResource, "inventory");
+            BakedModel replaceModel = modelManager.getModel(unknownModel);
 
-            for (String ItemName : preUnknownItemList) {
-                ResourceLocation OriginResource = ResourceLocation.parse(ItemName);
-                ModelResourceLocation OriginModel =  new ModelResourceLocation(OriginResource, "inventory");
-                BakedModel rawModel = modelManager.getModel(OriginModel);
+            for (String itemName : preUnknownItemList) {
+                ResourceLocation originResource = ResourceLocation.parse(itemName);
+                ModelResourceLocation originModel =  new ModelResourceLocation(originResource, "inventory");
+                BakedModel rawModel = modelManager.getModel(originModel);
 
-                replacedmap.put(ItemName, rawModel);
+                replacedMap.put(itemName, rawModel);
 
-                replaceModel(OriginModel, replaceModel, modelManager);
+                replaceModel(originModel, replaceModel, modelManager);
             }
 
-            RebakeCommand.reloadmodel();
+            RebakeCommand.reloadModel();
 
         }
 
     }
 
-    public static void replaceModel (ModelResourceLocation OriginModel, BakedModel replaceModel, ModelManager modelManager) {
+    public static void replaceModel (ModelResourceLocation originModel, BakedModel replaceModel, ModelManager modelManager) {
         Minecraft minecraft = Minecraft.getInstance();
         try {
             Field modelsField = ModelManager.class.getDeclaredField("bakedRegistry");
@@ -92,7 +90,7 @@ public class HardcoreAstagesItem {
             Map<ModelResourceLocation, BakedModel> bakedRegistry =
                     (Map<ModelResourceLocation, BakedModel>) modelsField.get(modelManager);
 
-            bakedRegistry.put(OriginModel, replaceModel);
+            bakedRegistry.put(originModel, replaceModel);
             System.out.println("Replaced Success");
 
         } catch (NoSuchFieldException | IllegalAccessException e) {

@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class UnknownItem {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(HardcoreAstagesItem.MODID);
 
-    public static final DeferredItem<Item> UNKNOWNITEM = ITEMS.register("unknown_item",
+    public static final DeferredItem<Item> unknownItem = ITEMS.register("unknown_item",
             () -> new Item(new Item.Properties()));
 
     public static void register(IEventBus eventBus) {
