@@ -2,7 +2,6 @@ package com.liquor.hardcoreastagesitem.commands;
 
 import com.liquor.hardcoreastagesitem.GetUnknownItemList;
 import com.liquor.hardcoreastagesitem.HardcoreAstagesItem;
-import com.liquor.hardcoreastagesitem.HardcoreAstagesItemClient;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
@@ -11,27 +10,12 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
-import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.slf4j.Logger;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 @OnlyIn(Dist.CLIENT)
 public class RebakeCommand {
@@ -53,29 +37,27 @@ public class RebakeCommand {
         );
     }
 
-    private static void reloadmodel() {
+    public static void reloadmodel() {
         Minecraft minecraft = Minecraft.getInstance();
         ModelManager modelManager = minecraft.getModelManager();
 
         final List<String> preUnknownItemList = HardcoreAstagesItem.getpreUnknownItemList();
-        final List<String> UnknownItemList = HardcoreAstagesItem.getUnknownItemList();
+        final List<String> UnknownItemList = GetUnknownItemList.getUnknownItemList();
 
-        // ResourceLocation UnknownItemResource = ResourceLocation.parse("hardcoreastagesitem:unknown_item");
-        // ModelResourceLocation UnknownModel =  new ModelResourceLocation(UnknownItemResource, "inventory");
         for (String ItemName : preUnknownItemList) {
             if (UnknownItemList.contains(ItemName)) {
                 continue;
             }else{
                 ResourceLocation OriginResource = ResourceLocation.parse(ItemName);
+
                 ModelResourceLocation OriginModel =  new ModelResourceLocation(OriginResource, "inventory");
+
                 BakedModel replaceModel = HardcoreAstagesItem.replacedmap.get(ItemName);
-                // BakedModel replaceModel = modelManager.getModel(OriginModel);
-                // replaceModel = HardcoreAstagesItem.Ironraw;
+
                 HardcoreAstagesItem.replaceModel(OriginModel, replaceModel, modelManager);
             }
 
         }
-        GetUnknownItemList.getItemsForStage("Iron");
 
     }
 
