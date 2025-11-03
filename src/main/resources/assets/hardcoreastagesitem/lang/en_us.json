@@ -3,9 +3,6 @@
 
   "hardcoreastagesitem.configuration.title": "HardcoreAstagesItem Configs",
   "hardcoreastagesitem.configuration.section.hardcoreastagesitem.common.toml": "HardcoreAstagesItem Configs",
-  "hardcoreastagesitem.configuration.section.hardcoreastagesitem.common.toml.title": "HardcoreAstagesItem Configs",
-  "hardcoreastagesitem.configuration.items": "Item List",
-  "hardcoreastagesitem.configuration.logDirtBlock": "Log Dirt Block",
-  "hardcoreastagesitem.configuration.magicNumberIntroduction": "Magic Number Text",
-  "hardcoreastagesitem.configuration.magicNumber": "Magic Number"
+  "hardcoreastagesitem.configuration.section.hardcoreastagesitem.common.toml.title": "HardcoreAstagesItem Configs"
+
 }

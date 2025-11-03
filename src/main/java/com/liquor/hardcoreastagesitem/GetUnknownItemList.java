@@ -3,6 +3,8 @@ package com.liquor.hardcoreastagesitem;
 import com.alessandro.astages.capability.ClientPlayerStage;
 import com.alessandro.astages.integration.jei.AItemStagesJEIPlugin;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -24,7 +26,7 @@ public class GetUnknownItemList {
 
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
-            System.err.println("Replaced Failed");
+            HardcoreAstagesItem.LOGGER.error("Replaced Failed");
         }
         return itemNameList;
     }
@@ -48,7 +50,7 @@ public class GetUnknownItemList {
 
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
-            System.err.println("Replaced Failed");
+            HardcoreAstagesItem.LOGGER.error("Replaced Failed");
         }
         return itemNameList;
     }
