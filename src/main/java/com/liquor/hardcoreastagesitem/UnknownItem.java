@@ -1,6 +1,5 @@
-package com.liquor.hardcoreastagesitem.Items;
+package com.liquor.hardcoreastagesitem;
 
-import com.liquor.hardcoreastagesitem.HardcoreAstagesItem;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;

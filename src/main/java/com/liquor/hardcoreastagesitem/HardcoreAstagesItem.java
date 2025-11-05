@@ -1,108 +1,74 @@
 package com.liquor.hardcoreastagesitem;
 
-import com.liquor.hardcoreastagesitem.Items.UnknownItem;
-import com.liquor.hardcoreastagesitem.commands.RebakeCommand;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.*;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.ModContainer;
-import java.lang.reflect.Field;
-import java.util.*;
 
-// The value here should match an entry in the META-INF/neoforge.mods.toml file
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Mod(HardcoreAstagesItem.MODID)
 public class HardcoreAstagesItem {
-    // Define mod id in a common place for everything to reference
     public static final String MODID = "hardcoreastagesitem";
 
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    private static boolean isExecuted = false;
-
     public static Map<String, BakedModel> replacedMap = new HashMap<>();
 
-    private static List<String> preUnknownItemList = new ArrayList<>();
+    public static boolean isExecuted = false;
 
-    public HardcoreAstagesItem(IEventBus modEventBus, ModContainer modContainer) {
-        // Register the commonSetup method for modloading
+    public HardcoreAstagesItem(IEventBus modEventBus) {
 
-        // Register ourselves for server and other game events we are interested in.
-        // Note that this is necessary if and only if we want *this* class (HardcoreAstagesItem) to respond directly to events.
-        // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         UnknownItem.register(modEventBus);
 
-        NeoForge.EVENT_BUS.register(RebakeCommand.class);
+        NeoForge.EVENT_BUS.register(RebakeModel.class);
         NeoForge.EVENT_BUS.addListener(this::onPlayerEnterWorld);
 
-        preUnknownItemList.add("minecraft:iron_ingot");
-
-        // Register our mod's ModConfigSpec so that FML can create and load the config file for us
-        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
-    }
-
-    public static List<String> getpreUnknownItemList() {
-        return preUnknownItemList;
     }
 
     @SubscribeEvent
     private void onPlayerEnterWorld(RenderGuiEvent.Post event) {
         if (!isExecuted) {
-            preUnknownItemList = GetUnknownItemList.getPreUnknownItemList();
+
             isExecuted = true;
 
             Minecraft minecraft = Minecraft.getInstance();
             ModelManager modelManager = minecraft.getModelManager();
 
             ResourceLocation unknownItemResource = ResourceLocation.parse("hardcoreastagesitem:unknown_item");
-            ModelResourceLocation unknownModel =  new ModelResourceLocation(unknownItemResource, "inventory");
+            ModelResourceLocation unknownModel = new ModelResourceLocation(unknownItemResource, "inventory");
             BakedModel replaceModel = modelManager.getModel(unknownModel);
 
-            for (String itemName : preUnknownItemList) {
-                ResourceLocation originResource = ResourceLocation.parse(itemName);
-                ModelResourceLocation originModel =  new ModelResourceLocation(originResource, "inventory");
-                BakedModel rawModel = modelManager.getModel(originModel);
+            if (ServerLifecycleHooks.getCurrentServer() != null) {
+                for (ServerPlayer onlinePlayer : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
+                    List<Item> unknownItems = GetItemList.GetUnknownItemList(onlinePlayer);
+                    LOGGER.debug("Get Unknown Item: {}", unknownItems);
 
-                replacedMap.put(itemName, rawModel);
+                    for (Item itemName : unknownItems) {
+                        ResourceLocation originResource = ResourceLocation.parse(String.valueOf(itemName));
+                        ModelResourceLocation originModel = new ModelResourceLocation(originResource, "inventory");
+                        BakedModel rawModel = modelManager.getModel(originModel);
 
-                replaceModel(originModel, replaceModel, modelManager);
+                        replacedMap.put(String.valueOf(itemName), rawModel);
+
+                        RebakeModel.replaceModel(originModel, replaceModel, modelManager);
+                    }
+                }
             }
-
-            RebakeCommand.reloadModel();
-
+            RebakeModel.reloadModel();
         }
-
     }
-
-    public static void replaceModel (ModelResourceLocation originModel, BakedModel replaceModel, ModelManager modelManager) {
-        Minecraft minecraft = Minecraft.getInstance();
-        try {
-            Field modelsField = ModelManager.class.getDeclaredField("bakedRegistry");
-            modelsField.setAccessible(true); // Get the access
-
-            @SuppressWarnings("unchecked")
-            Map<ModelResourceLocation, BakedModel> bakedRegistry =
-                    (Map<ModelResourceLocation, BakedModel>) modelsField.get(modelManager);
-
-            bakedRegistry.put(originModel, replaceModel);
-            LOGGER.info("Replaced Failed");
-
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-            LOGGER.error("Replaced Failed");
-        }
-        minecraft.getItemRenderer().onResourceManagerReload(minecraft.getResourceManager());
-
-    }
-
 }
