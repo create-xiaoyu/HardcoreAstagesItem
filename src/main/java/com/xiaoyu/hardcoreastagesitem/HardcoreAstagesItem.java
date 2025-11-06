@@ -30,8 +30,8 @@ public class HardcoreAstagesItem {
     public static final Map<String, BakedModel> replacedMap = new HashMap<>();
     public boolean isExecuted = false;
 
-    public HardcoreAstagesItem(IEventBus modEventBus) {
-        // IEventBus modEventBus = FMLJavaModLoadingContext.getModEventBus();
+    public HardcoreAstagesItem() {
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         UnknownItem.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(RebakeModel.class);

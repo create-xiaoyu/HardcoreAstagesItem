@@ -27,7 +27,7 @@ public class RebakeModel {
         Minecraft minecraft = Minecraft.getInstance();
 
         try {
-            Field modelsField = ModelManager.class.getDeclaredField("bakedRegistry");
+            Field modelsField = ModelManager.class.getDeclaredField("f_119397_");
             modelsField.setAccessible(true);
 
             @SuppressWarnings("unchecked")
