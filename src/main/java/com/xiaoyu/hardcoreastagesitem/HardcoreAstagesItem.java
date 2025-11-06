@@ -28,10 +28,10 @@ public class HardcoreAstagesItem {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final Map<String, BakedModel> replacedMap = new HashMap<>();
-    public static boolean isExecuted = false;
+    public boolean isExecuted = false;
 
-    public HardcoreAstagesItem() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public HardcoreAstagesItem(IEventBus modEventBus) {
+        // IEventBus modEventBus = FMLJavaModLoadingContext.getModEventBus();
         UnknownItem.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(RebakeModel.class);
@@ -45,7 +45,7 @@ public class HardcoreAstagesItem {
             Minecraft minecraft = Minecraft.getInstance();
             ModelManager modelManager = minecraft.getModelManager();
 
-            ResourceLocation unknownItemResource = new ResourceLocation(MODID, "unknown_item");
+            ResourceLocation unknownItemResource = ResourceLocation.parse("hardcoreastagesitem:unknown_item");
             ModelResourceLocation unknownModel = new ModelResourceLocation(unknownItemResource, "inventory");
             BakedModel replaceModel = modelManager.getModel(unknownModel);
 
