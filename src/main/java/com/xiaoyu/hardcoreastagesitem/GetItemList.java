@@ -1,4 +1,4 @@
-package com.liquor.hardcoreastagesitem;
+package com.xiaoyu.hardcoreastagesitem;
 
 import com.alessandro.astages.core.ARestrictionManager;
 import com.alessandro.astages.core.server.manager.AItemManager;

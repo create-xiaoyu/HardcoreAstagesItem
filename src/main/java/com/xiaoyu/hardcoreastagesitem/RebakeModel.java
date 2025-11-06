@@ -1,4 +1,4 @@
-package com.liquor.hardcoreastagesitem;
+package com.xiaoyu.hardcoreastagesitem;
 
 import com.alessandro.astages.event.custom.actions.StageAddedPlayerEvent;
 import com.alessandro.astages.event.custom.actions.StageRemovedPlayerEvent;
@@ -9,13 +9,13 @@ import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -44,6 +44,7 @@ public class RebakeModel {
         minecraft.getItemRenderer().onResourceManagerReload(minecraft.getResourceManager());
     }
 
+
     public static void reloadModel() {
         Minecraft minecraft = Minecraft.getInstance();
         ModelManager modelManager = minecraft.getModelManager();
@@ -52,11 +53,17 @@ public class RebakeModel {
             for (ServerPlayer onlinePlayer : ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers()) {
                 List<Item> unlockItems = GetItemList.GetUnlockItemList(onlinePlayer);
                 for (Item item : unlockItems) {
-                    ResourceLocation itemRegistryName = BuiltInRegistries.ITEM.getKey(item);
+                    ResourceLocation itemRegistryName = ForgeRegistries.ITEMS.getKey(item);
 
-                    ModelResourceLocation originModel = new ModelResourceLocation(itemRegistryName, "inventory");
+                    ModelResourceLocation originModel = null;
+                    if (itemRegistryName != null) {
+                        originModel = new ModelResourceLocation(itemRegistryName, "inventory");
+                    }
 
-                    BakedModel replaceModel = HardcoreAstagesItem.replacedMap.get(itemRegistryName.toString());
+                    BakedModel replaceModel = null;
+                    if (itemRegistryName != null) {
+                        replaceModel = HardcoreAstagesItem.replacedMap.get(itemRegistryName.toString());
+                    }
 
                     if (replaceModel == null) {
                         HardcoreAstagesItem.LOGGER.warn("No replacement model found for: {}", itemRegistryName);
